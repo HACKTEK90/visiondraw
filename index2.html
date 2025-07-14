@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Vision Drawing + Images</title>
+  <script src="https://js.puter.com/v2/"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
+  <style>
+    :root {
+      --accent: #111;
+      --bg: #f9f9f9;
+      --text: #111;
+    }
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      margin: 0;
+      padding: 24px;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    #canvas {
+      border: 1px solid var(--accent);
+      background: #fff;
+      width: min(90vw, 650px);
+      height: 60vh;
+      max-height: 520px;
+      touch-action: none;
+      border-radius: 0;
+    }
+    #toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      width: 100%;
+      max-width: 650px;
+    }
+    input[type="text"],
+    input[type="file"],
+    input[type="color"],
+    button,
+    input[type="range"] {
+      padding: 10px 12px;
+      font-size: 14px;
+      border: 1px solid var(--accent);
+      border-radius: 0;
+      background: #fff;
+      transition: 0.2s;
+    }
+    button {
+      background: var(--accent);
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #222;
+    }
+    #status, #answer {
+      max-width: 650px;
+      width: 100%;
+      border: 1px solid var(--accent);
+      border-radius: 0;
+      padding: 12px;
+      background: #f0f0f0;
+      text-align: left;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<!-- ... existing <head> remains unchanged -->
+<body>
+  <canvas id="canvas"></canvas>
+  <div id="toolbar">
+    <input type="color" id="color" title="Brush colour" value="#000000">
+    <input type="range" id="size" min="1" max="20" value="4" title="Brush size">
+    <input type="file" id="imgInput" accept="image/*" title="Import image">
+    <input type="text" id="q" placeholder="Ask something about the canvas…" style="flex:1;min-width:160px">
+    <button id="askBtn">Ask AI</button>
+    <button id="undoBtn">Undo</button>
+    <button id="redoBtn">Redo</button>
+    <button id="clearBtn">Clear</button>
+    <button id="downloadBtn">Download</button>
+    <button id="zoomInBtn">🔍+</button>
+    <button id="zoomOutBtn">🔍-</button>
+    
+  </div>
+  <div id="status">🖼️ Images: 0  |  ✏️ Strokes: 0</div>
+  <div id="answer">🧠 Ready.</div>
+
+<script>
+let strokes = [], images = [], redoStrokes = [], zoom = 1, panX = 0, panY = 0;
+const canvasEl = document.getElementById('canvas');
+const ctx = canvasEl.getContext('2d');
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+function resizeCanvas() {
+  const rect = canvasEl.getBoundingClientRect();
+  canvasEl.width = rect.width;
+  canvasEl.height = rect.height;
+  redraw();
+}
+
+function updateStatus(extra = '') {
+  const status = document.getElementById('status');
+  status.textContent = `🖼️ Images: ${images.length}  |  ✏️ Strokes: ${strokes.length}` + (extra ? `  |  ${extra}` : '');
+}
+
+let drawing = false;
+canvasEl.addEventListener('pointerdown', e => {
+  drawing = true;
+  const s = [{ x: (e.offsetX - panX) / zoom, y: (e.offsetY - panY) / zoom, col: ctx.strokeStyle, sz: ctx.lineWidth }];
+  strokes.push(s);
+  redoStrokes = [];
+  ctx.beginPath();
+  ctx.moveTo(e.offsetX, e.offsetY);
+  updateStatus('Drawing…');
+});
+canvasEl.addEventListener('pointermove', e => {
+  if (!drawing) return;
+  const s = strokes[strokes.length - 1];
+  const px = (e.offsetX - panX) / zoom;
+  const py = (e.offsetY - panY) / zoom;
+  s.push({ x: px, y: py });
+  redraw();
+});
+['pointerup', 'pointerleave', 'pointercancel'].forEach(ev =>
+  canvasEl.addEventListener(ev, () => {
+    if (drawing) {
+      drawing = false;
+      updateStatus();
+    }
+  })
+);
+
+const colorInput = document.getElementById('color');
+const sizeSlider = document.getElementById('size');
+colorInput.oninput = () => redraw();
+sizeSlider.oninput = () => redraw();
+
+function redraw() {
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+  ctx.setTransform(zoom, 0, 0, zoom, panX, panY);
+  images.forEach(o => ctx.drawImage(o.img, o.x, o.y, o.w, o.h));
+  strokes.forEach(path => {
+    ctx.strokeStyle = path[0].col;
+    ctx.lineWidth = path[0].sz;
+    ctx.beginPath();
+    ctx.moveTo(path[0].x, path[0].y);
+    for (let i = 1; i < path.length; i++) {
+      ctx.lineTo(path[i].x, path[i].y);
+    }
+    ctx.stroke();
+  });
+}
+
+function answer(msg) {
+  document.getElementById('answer').textContent = msg;
+}
+
+document.getElementById('clearBtn').onclick = () => {
+  strokes.length = 0;
+  images.length = 0;
+  redraw();
+  updateStatus();
+  answer('🧹 Canvas cleared.');
+};
+
+document.getElementById('undoBtn').onclick = () => {
+  if (strokes.length > 0) {
+    redoStrokes.push(strokes.pop());
+    redraw();
+    updateStatus('Undo');
+  }
+};
+document.getElementById('redoBtn').onclick = () => {
+  if (redoStrokes.length > 0) {
+    strokes.push(redoStrokes.pop());
+    redraw();
+    updateStatus('Redo');
+  }
+};
+
+document.getElementById('downloadBtn').onclick = () => {
+  const link = document.createElement('a');
+  link.download = 'drawing.png';
+  link.href = canvasEl.toDataURL();
+  link.click();
+};
+
+document.getElementById('zoomInBtn').onclick = () => {
+  zoom *= 1.1;
+  redraw();
+  updateStatus('Zoom In');
+};
+document.getElementById('zoomOutBtn').onclick = () => {
+  zoom /= 1.1;
+  redraw();
+  updateStatus('Zoom Out');
+};
+
+let dragging = false, startX = 0, startY = 0;
+canvasEl.addEventListener('mousedown', e => {
+  if (!drawing) {
+    dragging = true;
+    startX = e.clientX;
+    startY = e.clientY;
+  }
+});
+canvasEl.addEventListener('mouseup', () => dragging = false);
+canvasEl.addEventListener('mousemove', e => {
+  if (dragging) {
+    panX += e.clientX - startX;
+    panY += e.clientY - startY;
+    startX = e.clientX;
+    startY = e.clientY;
+    redraw();
+  }
+});
+
+
+
+const imgInput = document.getElementById('imgInput');
+imgInput.onchange = e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const img = new Image();
+  img.onload = () => {
+    const maxW = canvasEl.width * 0.6, maxH = canvasEl.height * 0.6;
+    let w = img.width, h = img.height;
+    const ratio = Math.min(maxW / w, maxH / h, 1);
+    w *= ratio; h *= ratio;
+    const x = (canvasEl.width - w) / 2 / zoom - panX / zoom;
+    const y = (canvasEl.height - h) / 2 / zoom - panY / zoom;
+    images.push({ img, x, y, w, h });
+    redraw();
+    updateStatus('Image added');
+  };
+  img.src = URL.createObjectURL(file);
+  e.target.value = '';
+};
+
+document.getElementById('askBtn').onclick = async () => {
+  const q = document.getElementById('q').value.trim();
+  if (!q) {
+    answer('❗ Enter a question.');
+    return;
+  }
+  answer('⏳ Processing…');
+  const imgData = canvasEl.toDataURL('image/png');
+  try {
+    const reply = await puter.ai.chat(q, imgData);
+    answer(reply || '(no reply)');
+  } catch (err) {
+    console.error(err);
+    answer('❌ ' + err.message);
+  }
+};
+
+updateStatus();
+</script>
+</body>
+
+</html>
