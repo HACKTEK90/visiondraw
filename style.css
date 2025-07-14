@@ -15,9 +15,12 @@ body {
   display: flex;
   height: 100vh;
   overflow: hidden;
+  flex-direction: row; /* Default for larger screens */
 }
+
+/* Sidebar and Main Content Layout */
 #sidebar {
-  width: 220px;
+  width: 220px; /* Fixed width for desktop */
   background: #fff;
   border-right: 1px solid var(--accent);
   padding: 24px 12px;
@@ -35,16 +38,21 @@ body {
   padding: 24px;
   gap: 16px;
   overflow-y: auto;
+  width: 100%; /* Ensure main content takes available width */
 }
+
+/* Canvas Sizing */
 #canvas {
   border: 1px solid var(--accent);
   background: #fff;
-  width: min(90vw, 650px);
-  height: 60vh;
+  width: min(90vw, 650px); /* Responsive width, capped at 650px */
+  height: 60vh; /* Responsive height */
   max-height: 520px;
   touch-action: none;
   border-radius: 0;
 }
+
+/* Toolbar and Inputs */
 #toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -64,7 +72,7 @@ select {
   border-radius: 0;
   background: #fff;
   transition: 0.2s;
-  width: 100%;
+  width: 100%; /* Make inputs and selects full width in sidebar by default */
 }
 button {
   background: var(--accent);
@@ -75,6 +83,8 @@ button {
 button:hover {
   background: #222;
 }
+
+/* Status and Answer */
 #status, #answer {
   max-width: 650px;
   width: 100%;
@@ -85,6 +95,8 @@ button:hover {
   text-align: left;
   font-size: 14px;
 }
+
+/* Tool Group */
 .tool-group {
   display: flex;
   flex-wrap: wrap;
@@ -103,6 +115,8 @@ button:hover {
 .active-tool {
   background: #555 !important;
 }
+
+/* Color Picker UI */
 #color-picker-wrapper {
   display: flex;
   align-items: center;
@@ -134,6 +148,8 @@ button:hover {
   font-size: 14px;
   text-align: center;
 }
+
+/* Section Titles */
 .section-title {
   font-weight: bold;
   margin-top: 10px;
@@ -142,17 +158,101 @@ button:hover {
   text-align: center;
   width: 100%;
 }
+
+/* Text Input Container */
 #textInputContainer {
   display: none; /* Hidden by default */
   width: 100%;
-  flex-direction: column; /* Changed to column to stack input and help text */
-  gap: 5px; /* Added gap for spacing */
+  flex-direction: column; /* Stack input and help text */
+  gap: 5px;
 }
 #text-help {
   font-size: 12px;
   color: #666;
   text-align: center;
   line-height: 1.4;
-  margin-top: 0; /* Adjusted margins */
-  margin-bottom: 0; /* Adjusted margins */
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* ------------------------------------------- */
+/* RESPONSIVE DESIGN (MOBILE)        */
+/* ------------------------------------------- */
+
+@media (max-width: 768px) {
+  body {
+    flex-direction: column; /* Stack sidebar and main content vertically */
+    height: auto; /* Allow body to grow based on content */
+    overflow-y: auto; /* Allow scrolling for the entire page */
+  }
+
+  #sidebar {
+    width: 100%; /* Sidebar takes full width */
+    height: auto; /* Height adapts to content */
+    border-right: none; /* Remove right border */
+    border-bottom: 1px solid var(--accent); /* Add bottom border */
+    padding: 15px 10px; /* Slightly reduced padding */
+    gap: 10px; /* Slightly reduced gap */
+    flex-wrap: wrap; /* Allow sections within sidebar to wrap */
+  }
+
+  #main-content {
+    padding: 15px 10px; /* Slightly reduced padding for main content */
+    height: auto; /* Allow main content to grow */
+    min-height: calc(100vh - 100px); /* Ensure canvas has enough space if sidebar is small */
+  }
+
+  #canvas {
+    width: 95vw; /* Slightly more aggressive width for mobile */
+    height: 50vh; /* Reduced height on mobile to make room for controls */
+    max-height: 400px; /* Max height for mobile canvas */
+  }
+
+  /* Adjust tool group buttons for better fit on small screens */
+  .tool-group button {
+    flex: 1 1 calc(33% - 10px); /* 3 buttons per row */
+    font-size: 12px;
+    padding: 6px 8px;
+  }
+
+  /* Make filter options and apply button stack nicely */
+  #filterSelect, #applyFilterBtn {
+    width: 100%;
+  }
+
+  /* Stack AI question and button on smaller screens */
+  #toolbar {
+    flex-direction: column;
+    gap: 5px;
+  }
+  #q, #askBtn {
+    width: 100%;
+  }
+}
+
+/* Even smaller screens (e.g., very narrow phones) */
+@media (max-width: 480px) {
+  #sidebar {
+    padding: 10px 5px;
+    gap: 8px;
+  }
+  #main-content {
+    padding: 10px 5px;
+  }
+  .tool-group button {
+    flex: 1 1 calc(50% - 7.5px); /* 2 buttons per row */
+  }
+  #canvas {
+    width: 98vw; /* Almost full width */
+    height: 45vh;
+  }
+  input[type="text"],
+  input[type="file"],
+  button,
+  input[type="range"],
+  select,
+  #status, #answer {
+    font-size: 13px;
+    padding: 8px 10px;
+  }
 }
