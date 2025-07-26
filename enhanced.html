@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>VisionDraw Studio</title>
+  <script src="https://js.puter.com/v2/"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="enhanced-style.css">
+</head>
+<body>
+  <div class="app-container">
+    <header>
+      <button id="menuToggle" class="menu-toggle">
+        <i class="fas fa-bars"></i>
+      </button>
+      <div class="logo">
+        VisionDraw
+      </div>
+
+      <div class="header-actions">
+        <button id="hideNavbarBtn" title="Hide Navbar">
+          <i class="fas fa-eye-slash"></i>
+        </button>
+        <button id="themeToggle" title="Toggle Dark/Light Mode">
+          <i class="fas fa-moon"></i>
+        </button>
+      </div>
+    </header>
+
+    <button id="showNavbarBtn" title="Show Navbar">
+      <i class="fas fa-eye"></i>
+    </button>
+    
+    <div class="main-container">
+      <!-- Mobile toolbar -->
+      <div class="mobile-toolbar">
+        <div class="toolbar-scroll">
+          <button id="mobileDrawingBtn" class="mobile-menu-btn active" data-target="drawing-tools">
+            <i class="fas fa-pencil-alt"></i>
+          </button>
+          <button id="mobileShapesBtn" class="mobile-menu-btn" data-target="shape-tools">
+            <i class="fas fa-shapes"></i>
+          </button>
+          <button id="mobileColorBtn" class="mobile-menu-btn" data-target="color-tools">
+            <i class="fas fa-palette"></i>
+          </button>
+          <button id="mobileBrushBtn" class="mobile-menu-btn" data-target="brush-tools">
+            <i class="fas fa-sliders-h"></i>
+          </button>
+          <button id="mobileLayersBtn" class="mobile-menu-btn" data-target="layer-tools">
+            <i class="fas fa-layer-group"></i>
+          </button>
+          <button id="mobileAdvancedBtn" class="mobile-menu-btn" data-target="advanced-tools">
+            <i class="fas fa-magic"></i>
+          </button>
+          <button id="mobileMediaBtn" class="mobile-menu-btn" data-target="media-tools">
+            <i class="fas fa-image"></i>
+          </button>
+          <button id="mobileVideoBtn" class="mobile-menu-btn" data-target="video-tools">
+            <i class="fas fa-video"></i>
+          </button>
+          <button id="mobileActionsBtn" class="mobile-menu-btn" data-target="action-tools">
+            <i class="fas fa-cog"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Sidebar with tools -->
+      <div id="sidebar" class="sidebar">
+        <div class="sidebar-close">
+          <button id="closeSidebar">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <div id="drawing-tools" class="tool-section active-section">
+          <h3><i class="fas fa-pencil-alt"></i> Drawing Tools</h3>
+          <div class="tool-group">
+            <button id="brushTool" class="active-tool" title="Brush Tool">
+              <i class="fas fa-paint-brush"></i>
+            </button>
+            <button id="pencilTool" title="Pencil Tool">
+              <i class="fas fa-pencil-alt"></i>
+            </button>
+            <button id="sprayTool" title="Spray Tool">
+              <i class="fas fa-spray-can"></i>
+            </button>
+            <button id="markerTool" title="Marker Tool">
+              <i class="fas fa-highlighter"></i>
+            </button>
+            <button id="calligraphyTool" title="Calligraphy Tool">
+              <i class="fas fa-feather-alt"></i>
+            </button>
+            <button id="smudgeTool" title="Smudge Tool">
+              <i class="fas fa-hand-paper"></i>
+            </button>
+            <button id="eraserTool" title="Eraser Tool">
+              <i class="fas fa-eraser"></i>
+            </button>
+            <button id="fillTool" title="Fill Tool">
+              <i class="fas fa-fill-drip"></i>
+            </button>
+            <button id="eyedropperTool" title="Color Picker Tool">
+              <i class="fas fa-eye-dropper"></i>
+            </button>
+            <button id="cloneTool" title="Clone Tool">
+              <i class="fas fa-clone"></i>
+            </button>
+            <button id="blurTool" title="Blur Tool">
+              <i class="fas fa-adjust"></i>
+            </button>
+            <button id="sharpenTool" title="Sharpen Tool">
+              <i class="fas fa-search-plus"></i>
+            </button>
+          </div>
+        </div>
+
+        <div id="shape-tools" class="tool-section">
+          <h3><i class="fas fa-shapes"></i> Shapes & Objects</h3>
+          <div class="tool-group">
+            <button id="rectTool" title="Rectangle Tool">
+              <i class="fas fa-square"></i>
+            </button>
+            <button id="circleTool" title="Circle Tool">
+              <i class="fas fa-circle"></i>
+            </button>
+            <button id="triangleTool" title="Triangle Tool">
+              <i class="fas fa-play fa-rotate-270"></i>
+            </button>
+            <button id="lineTool" title="Line Tool">
+              <i class="fas fa-slash"></i>
+            </button>
+            <button id="arrowTool" title="Arrow Tool">
+              <i class="fas fa-arrow-right"></i>
+            </button>
+            <button id="polygonTool" title="Polygon Tool">
+              <i class="fas fa-draw-polygon"></i>
+            </button>
+            <button id="starTool" title="Star Tool">
+              <i class="fas fa-star"></i>
+            </button>
+            <button id="heartTool" title="Heart Tool">
+              <i class="fas fa-heart"></i>
+            </button>
+            <button id="hexagonTool" title="Hexagon Tool">
+              <i class="fas fa-stop"></i>
+            </button>
+            <button id="textTool" title="Text Tool">
+              <i class="fas fa-font"></i>
+            </button>
+            <button id="stickerTool" title="Sticker Tool">
+              <i class="fas fa-smile"></i>
+            </button>
+            <button id="frameTool" title="Frame Tool">
+              <i class="fas fa-border-all"></i>
+            </button>
+          </div>
+        </div>
+
+        <div id="color-tools" class="tool-section">
+          <h3><i class="fas fa-palette"></i> Color</h3>
+          <div class="color-picker">
+            <div class="current-color">
+              <div id="colorPreview"></div>
+              <input type="color" id="color" value="#7c3aed">
+            </div>
+            <div id="color-display">#7c3aed</div>
+            <div class="color-palette">
+              <div class="color-swatch" style="background-color: #7c3aed" data-color="#7c3aed"></div>
+              <div class="color-swatch" style="background-color: #f97316" data-color="#f97316"></div>
+              <div class="color-swatch" style="background-color: #059669" data-color="#059669"></div>
+              <div class="color-swatch" style="background-color: #06b6d4" data-color="#06b6d4"></div>
+              <div class="color-swatch" style="background-color: #dc2626" data-color="#dc2626"></div>
+              <div class="color-swatch" style="background-color: #d97706" data-color="#d97706"></div>
+              <div class="color-swatch" style="background-color: #44403c" data-color="#44403c"></div>
+              <div class="color-swatch" style="background-color: #f5f5f4" data-color="#f5f5f4"></div>
+              <div class="color-swatch" style="background-color: #ec4899" data-color="#ec4899"></div>
+              <div class="color-swatch" style="background-color: #8b5cf6" data-color="#8b5cf6"></div>
+              <div class="color-swatch" style="background-color: #10b981" data-color="#10b981"></div>
+              <div class="color-swatch" style="background-color: #0ea5e9" data-color="#0ea5e9"></div>
+            </div>
+          </div>
+          
+          <div class="fill-options">
+            <div class="option-row">
+              <input type="checkbox" id="enableFill" title="Enable Fill">
+              <label for="enableFill">Fill Shape</label>
+            </div>
+            <div class="option-row">
+              <input type="color" id="fillColor" value="#ffffff">
+              <span id="fill-color-display">#ffffff</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="brush-tools" class="tool-section">
+          <h3><i class="fas fa-sliders-h"></i> Brush Settings</h3>
+          <div class="slider-container">
+            <label for="size">Size: <span id="size-display">5px</span></label>
+            <input type="range" id="size" min="1" max="50" value="5">
+          </div>
+          <div class="slider-container">
+            <label for="opacity">Opacity: <span id="opacity-display">100%</span></label>
+            <input type="range" id="opacity" min="1" max="100" value="100">
+          </div>
+          <div class="slider-container">
+            <label for="hardness">Hardness: <span id="hardness-display">100%</span></label>
+            <input type="range" id="hardness" min="0" max="100" value="100">
+          </div>
+          <div class="slider-container">
+            <label for="spacing">Spacing: <span id="spacing-display">25%</span></label>
+            <input type="range" id="spacing" min="1" max="100" value="25">
+          </div>
+          <div class="slider-container">
+            <label for="flow">Flow: <span id="flow-display">100%</span></label>
+            <input type="range" id="flow" min="1" max="100" value="100">
+          </div>
+          <div class="select-container">
+            <label for="brushCap">Cap Style:</label>
+            <select id="brushCap">
+              <option value="round">Round</option>
+              <option value="butt">Butt</option>
+              <option value="square">Square</option>
+            </select>
+          </div>
+          <div class="select-container">
+            <label for="brushJoin">Join Style:</label>
+            <select id="brushJoin">
+              <option value="round">Round</option>
+              <option value="miter">Miter</option>
+              <option value="bevel">Bevel</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="layer-tools" class="tool-section">
+          <h3><i class="fas fa-layer-group"></i> Layers</h3>
+          <div class="layers-toolbar">
+            <button id="addLayerBtn" title="Add Layer"><i class="fas fa-plus"></i></button>
+            <button id="deleteLayerBtn" title="Delete Layer"><i class="fas fa-trash"></i></button>
+            <button id="moveLayerUpBtn" title="Move Layer Up"><i class="fas fa-arrow-up"></i></button>
+            <button id="moveLayerDownBtn" title="Move Layer Down"><i class="fas fa-arrow-down"></i></button>
+          </div>
+          <div id="layers-list" class="layers-list">
+            <div class="layer active-layer" data-layer-id="0">
+              <span class="layer-visibility"><i class="fas fa-eye"></i></span>
+              <span class="layer-name">Background</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="advanced-tools" class="tool-section">
+          <h3><i class="fas fa-magic"></i> Advanced Tools</h3>
+          <div class="tool-group">
+            <button id="gradientTool" title="Gradient Tool">
+              <i class="fas fa-palette"></i>
+            </button>
+            <button id="patternTool" title="Pattern Tool">
+              <i class="fas fa-th"></i>
+            </button>
+            <button id="symmetryTool" title="Symmetry Tool">
+              <i class="fas fa-balance-scale"></i>
+            </button>
+            <button id="perspectiveTool" title="Perspective Tool">
+              <i class="fas fa-cube"></i>
+            </button>
+            <button id="measureTool" title="Measure Tool">
+              <i class="fas fa-ruler"></i>
+            </button>
+            <button id="gridTool" title="Grid Tool">
+              <i class="fas fa-border-all"></i>
+            </button>
+          </div>
+          <div class="advanced-options">
+            <div class="option-row">
+              <input type="checkbox" id="enableGrid" title="Show Grid">
+              <label for="enableGrid">Show Grid</label>
+            </div>
+            <div class="option-row">
+              <input type="checkbox" id="enableSnap" title="Snap to Grid">
+              <label for="enableSnap">Snap to Grid</label>
+            </div>
+            <div class="option-row">
+              <input type="checkbox" id="enableRulers" title="Show Rulers">
+              <label for="enableRulers">Show Rulers</label>
+            </div>
+          </div>
+        </div>
+
+        <div id="video-tools" class="tool-section">
+          <h3><i class="fas fa-video"></i> Video Drawing</h3>
+          <label for="videoInput" class="file-input-label">
+            <i class="fas fa-upload"></i> Load Video
+            <input type="file" id="videoInput" accept="video/*">
+          </label>
+          <div class="video-controls">
+            <button id="playPauseBtn" class="action-button" disabled>
+              <i class="fas fa-play"></i> Play
+            </button>
+            <div class="slider-container">
+              <label for="videoProgress">Progress:</label>
+              <input type="range" id="videoProgress" min="0" max="100" value="0" disabled>
+            </div>
+            <div class="slider-container">
+              <label for="videoOpacity">Video Opacity: <span id="video-opacity-display">50%</span></label>
+              <input type="range" id="videoOpacity" min="0" max="100" value="50">
+            </div>
+            <div class="option-row">
+              <input type="checkbox" id="enableVideoOverlay" title="Enable Video Overlay">
+              <label for="enableVideoOverlay">Show Video</label>
+            </div>
+          </div>
+        </div>
+
+        <div id="media-tools" class="tool-section">
+          <h3><i class="fas fa-image"></i> Media & Effects</h3>
+          <label for="imgInput" class="file-input-label">
+            <i class="fas fa-upload"></i> Import Image
+            <input type="file" id="imgInput" accept="image/*">
+          </label>
+          <div class="select-container">
+            <label for="filterSelect">Filter:</label>
+            <select id="filterSelect">
+              <option value="">No Filter</option>
+              <option value="grayscale">Grayscale</option>
+              <option value="invert">Invert</option>
+              <option value="sepia">Sepia</option>
+              <option value="blur">Blur</option>
+              <option value="brightness">Brightness</option>
+              <option value="contrast">Contrast</option>
+              <option value="hue-rotate">Hue Rotate</option>
+            </select>
+          </div>
+          <button id="applyFilterBtn" class="action-button"><i class="fas fa-magic"></i> Apply Filter</button>
+        </div>
+
+        <div id="action-tools" class="tool-section">
+          <h3><i class="fas fa-cog"></i> Actions</h3>
+          <div class="action-grid">
+            <button id="undoBtn" class="action-button" title="Undo"><i class="fas fa-undo"></i> Undo</button>
+            <button id="redoBtn" class="action-button" title="Redo"><i class="fas fa-redo"></i> Redo</button>
+            <button id="clearBtn" class="action-button" title="Clear Canvas"><i class="fas fa-trash-alt"></i> Clear</button>
+            <button id="downloadBtn" class="action-button" title="Download"><i class="fas fa-download"></i> Download</button>
+            <button id="shareBtn" class="action-button" title="Share"><i class="fas fa-share-alt"></i> Share</button>
+            <button id="resetViewBtn" class="action-button" title="Reset View"><i class="fas fa-expand"></i> Reset View</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="main-content">
+        <div class="canvas-container">
+          <div class="canvas-tools">
+            <div class="canvas-size-controls">
+              <select id="canvasSize" title="Canvas Size">
+                <option value="fit">Fit Screen</option>
+                <option value="a4">A4 (210×297mm)</option>
+                <option value="letter">Letter (8.5×11in)</option>
+                <option value="square">Square (800×800)</option>
+                <option value="wide">Wide (1200×600)</option>
+                <option value="custom">Custom Size</option>
+              </select>
+            </div>
+            <div class="zoom-controls">
+              <button id="zoomInBtn" title="Zoom In"><i class="fas fa-search-plus"></i></button>
+              <span id="zoom-level">100%</span>
+              <button id="zoomOutBtn" title="Zoom Out"><i class="fas fa-search-minus"></i></button>
+            </div>
+          </div>
+          <video id="videoOverlay" muted loop></video>
+          <canvas id="canvas"></canvas>
+          <div id="coordinates">X: 0, Y: 0</div>
+        </div>
+        
+        <div class="bottom-panel">
+          <div class="text-tool-panel" id="textToolPanel">
+            <input type="text" id="textToInsert" placeholder="Type text to add…">
+            <div class="text-options">
+              <select id="fontFamily">
+                <option value="Arial">Arial</option>
+                <option value="Verdana">Verdana</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Courier New">Courier New</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Comic Sans MS">Comic Sans MS</option>
+              </select>
+              <select id="fontStyle">
+                <option value="normal">Normal</option>
+                <option value="italic">Italic</option>
+                <option value="bold">Bold</option>
+                <option value="bold italic">Bold Italic</option>
+              </select>
+              <div class="text-align-options">
+                <button id="alignLeft" title="Align Left"><i class="fas fa-align-left"></i></button>
+                <button id="alignCenter" title="Align Center"><i class="fas fa-align-center"></i></button>
+                <button id="alignRight" title="Align Right"><i class="fas fa-align-right"></i></button>
+              </div>
+            </div>
+            <p id="text-help">Click on the canvas to place your text</p>
+          </div>
+
+          <div class="ai-panel" id="aiPanel">
+            <input type="text" id="q" placeholder="Ask AI about your drawing...">
+            <button id="askBtn"><i class="fas fa-robot"></i> Ask AI</button>
+          </div>
+        </div>
+
+        <div id="status-bar">
+          <div id="status">🖼️ Images: 0 | ✏️ Strokes: 0 | 📝 Text: 0 | 🔳 Shapes: 0</div>
+        </div>
+        
+        <div id="answer-container">
+          <div class="answer-header">
+            <h3><i class="fas fa-robot"></i> AI Assistant</h3>
+            <button id="closeAnswer"><i class="fas fa-times"></i></button>
+          </div>
+          <div id="answer">Ask me about your drawing!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile action buttons -->
+    <div class="mobile-action-bar">
+      <button id="mobileUndoBtn" title="Undo"><i class="fas fa-undo"></i></button>
+      <button id="mobileRedoBtn" title="Redo"><i class="fas fa-redo"></i></button>
+      <button id="mobileAIBtn" title="Ask AI"><i class="fas fa-robot"></i></button>
+      <button id="mobileDownloadBtn" title="Download"><i class="fas fa-download"></i></button>
+    </div>
+
+    </div>
+
+    <div id="toast-container"></div>
+  </div>
+
+  <div id="modal-container" class="hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modal-title">Share Your Drawing</h3>
+        <button id="close-modal"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-content" id="modal-content">
+        <!-- Modal content will be inserted here -->
+      </div>
+    </div>
+  </div>
+
+  <script src="enhanced-script.js"></script>
+</body>
+</html>
