@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0b10" />
+  <title>VisionDraw Docs — Draw to focus. Ask to discover.</title>
+  <meta name="description" content="VisionDraw documentation. Annotate images, ask targeted questions, and get context‑aware answers.">
+  <style>
+    :root{
+      --bg:#0b0b10;
+      --panel:#111118;
+      --muted:#1a1b24;
+      --text:#e8e9ef;
+      --sub:#b8bac7;
+      --primary:#ff6a00;
+      --primary-2:#ff9a3d;
+      --accent:#2a2d3a;
+      --ok:#2ecc71;
+      --warn:#ffb020;
+      --err:#ff5a5f;
+      --ring:0 0 0 2px rgba(255,106,0,.25);
+      --shadow:0 6px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.02);
+      --radius:14px;
+      --code:#0e0f14;
+      --code-border:#1a1c22;
+
+      /* Fluid type and spacing */
+      --fs-0: clamp(14px, 2.2vw, 16px);
+      --fs-1: clamp(18px, 2.6vw, 20px);
+      --fs-2: clamp(22px, 3.4vw, 28px);
+      --pad: clamp(14px, 2.4vw, 24px);
+      --gap: clamp(12px, 2.0vw, 28px);
+      --side: clamp(14px, 2.2vw, 24px);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:linear-gradient(180deg, #0a0b10 0%, #0c0c12 100%);
+      color:var(--text);
+      font:var(--fs-0)/1.6 Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, Apple Color Emoji, Segoe UI Emoji, Noto Color Emoji;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      letter-spacing:.2px;
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+      padding-bottom: env(safe-area-inset-bottom);
+      touch-action: manipulation;
+    }
+
+    /* Top mobile bar */
+    .topbar{
+      position:sticky; top:0; z-index:50;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:10px var(--side);
+      background:rgba(13,14,20,.7);
+      backdrop-filter: saturate(120%) blur(8px);
+      border-bottom:1px solid #1b1d28;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+    }
+    .brand h1{font-size:16px; margin:0; letter-spacing:.3px}
+    .tag{
+      color:var(--sub); font-size:12px;
+      background:rgba(255,255,255,.04);
+      border:1px solid #232533;
+      padding:3px 8px; border-radius:999px;
+    }
+    .menu-btn{
+      appearance:none; border:none; cursor:pointer;
+      background:#161823; color:#e6e7ef;
+      border:1px solid #262838;
+      border-radius:10px; padding:10px 12px;
+      display:inline-flex; align-items:center; gap:8px;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.04), 0 6px 16px rgba(0,0,0,.25);
+      touch-action: manipulation;
+    }
+    .menu-btn:focus-visible{outline:none; box-shadow:0 0 0 2px #23263a, var(--ring)}
+    .menu-btn svg{display:block}
+
+    /* Layout */
+    .app{
+      display:grid;
+      grid-template-columns: 280px 1fr;
+      min-height:100dvh;
+      gap:var(--gap);
+      padding:var(--pad);
+      padding-top: calc(var(--pad) + 8px);
+    }
+
+    /* Sidebar as drawer on mobile */
+    aside{
+      position:sticky; top:calc(56px + var(--pad)); align-self:start;
+      background:linear-gradient(180deg, #0f1016, #0d0e13);
+      border:1px solid #1c1e28;
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px;
+      height:calc(100dvh - 56px - var(--pad)*2);
+      overflow:auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .drawer{
+      position:fixed; inset:0 auto 0 0; width:min(86vw, 320px); z-index:60;
+      transform: translateX(-104%);
+      transition: transform .28s ease;
+    }
+    .drawer-overlay{
+      position:fixed; inset:0; background:rgba(0,0,0,.45);
+      opacity:0; visibility:hidden; transition:opacity .2s ease;
+      z-index:55;
+      backdrop-filter: blur(1px);
+    }
+    .drawer-open .drawer{ transform: translateX(0); }
+    .drawer-open .drawer-overlay{ opacity:1; visibility:visible; }
+
+    main{
+      max-width:980px; margin-right:auto; padding-right:8px;
+    }
+
+    /* Hero */
+    .hero{
+      background:linear-gradient(180deg, #10121a, #0d0f15);
+      border:1px solid #1b1d28; border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:24px; margin-bottom:14px;
+    }
+    .hero h2{margin:0 0 8px 0; font-size:var(--fs-2); letter-spacing:.4px}
+    .hero p{margin:0; color:var(--sub)}
+    .chip{
+      display:inline-flex; gap:8px; align-items:center; margin-top:12px; flex-wrap:wrap;
+      background:#141622; border:1px solid #222633; color:#dfe1ee;
+      padding:6px 10px; border-radius:999px; font-size:12px;
+    }
+
+    /* Sections */
+    section{
+      background:linear-gradient(180deg, #0f1118, #0d0f15);
+      border:1px solid #1a1c27; border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px; margin:14px 0;
+    }
+    section h3{
+      margin:0 0 10px 0; font-size:var(--fs-1);
+      display:flex; align-items:center; gap:10px;
+    }
+    section h3 .hash{
+      opacity:.55; font-weight:500; color:#9aa0b6; cursor:pointer;
+    }
+    section p{margin:8px 0; color:#d8d9e2}
+    ul{margin:10px 0 0 0; padding-left:20px}
+    li{margin:6px 0}
+
+    /* Search + TOC */
+    .nav-search{
+      display:flex; gap:10px; align-items:center;
+      background:var(--muted);
+      border:1px solid #232533;
+      border-radius:10px; padding:8px 10px;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+      margin:10px 0 14px 0;
+    }
+    .nav-search input{
+      flex:1; background:transparent; border:none; outline:none; color:var(--text);
+      font-size:14px;
+    }
+    .toc{
+      list-style:none; margin:0; padding:0;
+      display:flex; flex-direction:column; gap:6px;
+    }
+    .toc a{
+      display:block; padding:10px 12px; border-radius:10px;
+      color:#ffd7b5; text-decoration:none;
+      border:1px solid transparent;
+    }
+    .toc a:hover{background:#141622; border-color:#222535}
+
+    /* Callouts */
+    .callout{
+      background:#121521; border:1px solid #23263a; border-radius:12px;
+      padding:12px 14px; color:#d6d9e8; margin:12px 0;
+    }
+    .callout.ok{border-color:rgba(46,204,113,.35); background:rgba(46,204,113,.08)}
+    .callout.warn{border-color:rgba(255,176,32,.35); background:rgba(255,176,32,.08)}
+    .callout.err{border-color:rgba(255,90,95,.35); background:rgba(255,90,95,.08)}
+
+    /* Code */
+    pre{
+      background:var(--code); color:#e6e9f8; border:1px solid var(--code-border);
+      border-radius:12px; padding:14px; overflow:auto; box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+      margin:12px 0;
+    }
+    code{font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace; word-break:normal; white-space:pre}
+
+    /* Footer */
+    footer{
+      color:var(--sub); font-size:12px; margin:20px 0 10px 0;
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce){
+      *{scroll-behavior:auto !important; transition:none !important; animation:none !important}
+    }
+
+    /* Mobile-first adjustments */
+    @media (max-width: 980px){
+      .app{grid-template-columns:1fr; gap:16px; padding:12px}
+      aside{display:none}
+      main{padding-right:0}
+      .hero{padding:16px}
+      section{padding:14px}
+    }
+
+    /* Tablet+ layout shows the static sidebar */
+    @media (min-width: 981px){
+      .topbar .menu-btn{display:none}
+      .drawer, .drawer-overlay{display:none}
+      aside{display:block; position:sticky}
+    }
+
+    /* iOS momentum scrolling for drawers */
+    .drawer aside{height:100%; top:0}
+  </style>
+</head>
+<body>
+  <div class="topbar" role="banner">
+    <div class="brand">
+      <!-- Logo removed as requested; using text-only brand -->
+      <h1>VisionDraw Docs</h1>
+      <span class="tag">Editorial • Fast</span>
+    </div>
+    <button id="menuBtn" class="menu-btn" aria-controls="mobileDrawer" aria-expanded="false">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="#e6e7ef" aria-hidden="true">
+        <path d="M4 7h16M4 12h16M4 17h16" stroke="#e6e7ef" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      Menu
+    </button>
+  </div>
+
+  <!-- Mobile drawer -->
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <div id="mobileDrawer" class="drawer" role="dialog" aria-label="Table of contents">
+    <aside>
+      <div class="nav-search">
+        <svg width="16" height="16" fill="#9aa0b6" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 21l-4.2-4.2M10.8 18a7.2 7.2 0 1 1 0-14.4 7.2 7.2 0 0 1 0 14.4Z"/></svg>
+        <input id="filterMobile" type="search" placeholder="Filter docs..." aria-label="Filter docs" />
+      </div>
+      <ul class="toc" id="tocMobile">
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#quick-start">Quick start</a></li>
+        <li><a href="#annotation-tools">Annotation tools</a></li>
+        <li><a href="#asking-questions">Asking questions</a></li>
+        <li><a href="#supported-formats">Supported formats</a></li>
+        <li><a href="#use-cases">Use cases</a></li>
+        <li><a href="#accuracy-limits">Accuracy & limits</a></li>
+        <li><a href="#privacy-security">Privacy & security</a></li>
+        <li><a href="#workspaces-sharing">Workspaces & sharing</a></li>
+        <li class="grp">Reference</li>
+        <li><a href="#tips">Tips</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+    </aside>
+  </div>
+
+  <div class="app">
+    <!-- Desktop sidebar -->
+    <aside aria-label="Table of contents">
+      <div class="nav-search">
+        <svg width="16" height="16" fill="#9aa0b6" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 21l-4.2-4.2M10.8 18a7.2 7.2 0 1 1 0-14.4 7.2 7.2 0 0 1 0 14.4Z"/></svg>
+        <input id="filter" type="search" placeholder="Filter docs..." aria-label="Filter docs" />
+      </div>
+      <ul class="toc" id="toc">
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#quick-start">Quick start</a></li>
+        <li><a href="#annotation-tools">Annotation tools</a></li>
+        <li><a href="#asking-questions">Asking questions</a></li>
+        <li><a href="#supported-formats">Supported formats</a></li>
+        <li><a href="#use-cases">Use cases</a></li>
+        <li><a href="#accuracy-limits">Accuracy & limits</a></li>
+        <li><a href="#privacy-security">Privacy & security</a></li>
+        <li><a href="#workspaces-sharing">Workspaces & sharing</a></li>
+        <li class="grp">Reference</li>
+        <li><a href="#tips">Tips</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+    </aside>
+
+    <main>
+      <div class="hero">
+        <h2>Draw to focus. Ask to discover.</h2>
+        <p>Annotate images clearly, ask precise questions, and get instant answers grounded in the visual context.</p>
+        <div class="chip">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="#ff9a3d" aria-hidden="true"><path d="M12 2l2.09 6.26H20l-5.17 3.76L16.18 18 12 14.73 7.82 18l1.35-5.98L4 8.26h5.91L12 2z"/></svg>
+          Editorial UI • Fast outcomes
+        </div>
+      </div>
+
+      <section id="overview">
+        <h3><span class="hash" data-anchor="overview">#</span>Overview</h3>
+        <p>VisionDraw enables direct, practical flows for hardware, education, documents, and teams with a modern, fast documentation‑first UI.</p>
+        <p>Pen, arrow, and shape tools let users mark regions, label components, and add notes directly on images for precise, context‑aware questions and answers.</p>
+        <div class="callout ok">Short answers, clear outcomes designed to minimize back‑and‑forth and accelerate troubleshooting or study.</div>
+      </section>
+
+      <section id="quick-start">
+        <h3><span class="hash" data-anchor="quick-start">#</span>Quick start</h3>
+        <ol>
+          <li>Open an image or the first page of a PDF.</li>
+          <li>Use Pen, Arrow, Rectangle, or Ellipse to mark targets and add short labels.</li>
+          <li>Write a targeted question referencing the marks or labels.</li>
+          <li>Submit to receive an instant, context‑aware answer with the visual focus preserved.</li>
+        </ol>
+        <div class="callout warn">Tip: Specific, localized questions yield faster and more reliable answers, especially on technical diagrams and receipts.</div>
+      </section>
+
+      <section id="annotation-tools">
+        <h3><span class="hash" data-anchor="annotation-tools">#</span>Annotation tools</h3>
+        <ul>
+          <li>Pen: freehand emphasis or quick sketches.</li>
+          <li>Arrow: point to exact components, traces, or features.</li>
+          <li>Rectangle / Ellipse: frame regions of interest for clear reference.</li>
+          <li>Labels & notes: add brief descriptors, counts, or identifiers.</li>
+          <li>Circle connectors & highlight chips: chain related parts or steps for step‑wise explanations.</li>
+        </ul>
+        <div class="callout">Designed for force diagrams, circuit annotations, PCB markings, and document line‑item highlights.</div>
+      </section>
+
+      <section id="asking-questions">
+        <h3><span class="hash" data-anchor="asking-questions">#</span>Asking questions</h3>
+        <ul>
+          <li>Be explicit: reference shapes or labels (e.g., “What is the fault at arrow A?”).</li>
+          <li>Keep scope tight: one question per marked region improves precision.</li>
+          <li>Prefer concrete asks: “Compute total including tax” or “Identify missing component value.”</li>
+        </ul>
+        <div class="callout ok">Targeted, annotated prompts reduce ambiguity and increase answer accuracy.</div>
+      </section>
+
+      <section id="supported-formats">
+        <h3><span class="hash" data-anchor="supported-formats">#</span>Supported formats</h3>
+        <ul>
+          <li>Images: JPG, PNG, WebP.</li>
+          <li>PDF: first page is supported for fast annotation and extraction.</li>
+        </ul>
+        <div class="callout">Optimized for screenshots, diagrams, receipts, and schematics.</div>
+      </section>
+
+      <section id="use-cases">
+        <h3><span class="hash" data-anchor="use-cases">#</span>Use cases</h3>
+        <ul>
+          <li>Hardware: circle connectors, mark damage on PCBs, and label components for faster identification.</li>
+          <li>Education: annotate force diagrams or circuits for step‑wise explanations that students grasp quickly.</li>
+          <li>Documents: highlight totals, taxes, and line items for precise extractions with verification.</li>
+          <li>Teams: share annotated queries, comment, and track revisions across devices.</li>
+        </ul>
+        <div class="callout ok">Built for clarity and speed across practical workflows.</div>
+      </section>
+
+      <section id="accuracy-limits">
+        <h3><span class="hash" data-anchor="accuracy-limits">#</span>Accuracy & limits</h3>
+        <p><strong>Claim:</strong> Up to 95% on clear, annotated technical questions; accuracy depends on image quality and prompt clarity.</p>
+        <div class="callout warn">Note: Complex, low‑contrast, or multi‑question prompts may require iterative clarification.</div>
+        <p>Best results come from crisp annotations, unambiguous targets, and single‑intent queries that align with the marked regions.</p>
+      </section>
+
+      <section id="privacy-security">
+        <h3><span class="hash" data-anchor="privacy-security">#</span>Privacy & security</h3>
+        <ul>
+          <li>Encrypted in transit and at rest.</li>
+          <li>No training on user data.</li>
+        </ul>
+        <div class="callout ok">Enterprise posture prioritizes confidentiality for technical, academic, and financial documents.</div>
+      </section>
+
+      <section id="workspaces-sharing">
+        <h3><span class="hash" data-anchor="workspaces-sharing">#</span>Workspaces & sharing</h3>
+        <ul>
+          <li>Shared workspaces for collaboration.</li>
+          <li>Comments and revision history for review workflows.</li>
+          <li>Availability in Pro/Enterprise tiers.</li>
+        </ul>
+        <div class="callout">Consistent review history helps maintain auditability across teams and devices.</div>
+      </section>
+
+      <section id="tips">
+        <h3><span class="hash" data-anchor="tips">#</span>Tips</h3>
+        <ul>
+          <li>Prefer arrows and tight frames to isolate the exact region of interest.</li>
+          <li>Keep labels short; use multiple marks rather than long paragraphs.</li>
+          <li>Ask one concrete question per submission for the fastest answer turnaround.</li>
+        </ul>
+      </section>
+
+      <section id="faq">
+        <h3><span class="hash" data-anchor="faq">#</span>FAQ</h3>
+        <p><strong>What content types work best?</strong> Clear technical images, diagrams, and receipts with distinct regions of interest.</p>
+        <p><strong>Do PDFs work?</strong> Yes—first page is supported for quick annotation and extraction.</p>
+        <p><strong>Is collaboration supported?</strong> Shared workspaces, comments, and revision history are available on Pro/Enterprise.</p>
+        <p><strong>Any privacy guarantees?</strong> Data is encrypted in transit and at rest, and not used for training.</p>
+      </section>
+
+      <footer>
+        VisionDraw • Docs • Editorial UI • © 2025
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    // Drawer controls
+    const body = document.body;
+    const menuBtn = document.getElementById('menuBtn');
+    const drawer = document.getElementById('mobileDrawer');
+    const overlay = document.getElementById('drawerOverlay');
+
+    function openDrawer(){
+      body.classList.add('drawer-open');
+      menuBtn.setAttribute('aria-expanded','true');
+      // focus the search for quick filtering
+      const input = document.getElementById('filterMobile');
+      setTimeout(()=> input?.focus(), 120);
+    }
+    function closeDrawer(){
+      body.classList.remove('drawer-open');
+      menuBtn.setAttribute('aria-expanded','false');
+      menuBtn.focus({preventScroll:true});
+    }
+
+    menuBtn?.addEventListener('click', ()=>{
+      if(body.classList.contains('drawer-open')) closeDrawer();
+      else openDrawer();
+    });
+    overlay?.addEventListener('click', closeDrawer);
+    window.addEventListener('keydown', (e)=>{
+      if(e.key === 'Escape' && body.classList.contains('drawer-open')) closeDrawer();
+    }, {passive:true});
+
+    // Smooth scrolling for links
+    function wireSmoothLinks(scope){
+      scope.querySelectorAll('a[href^="#"]').forEach(a => {
+        a.addEventListener('click', (e) => {
+          const id = a.getAttribute('href').slice(1);
+          const target = document.getElementById(id);
+          if(target){
+            e.preventDefault();
+            target.scrollIntoView({behavior:'smooth', block:'start'});
+            history.pushState(null, '', '#' + id);
+            // Close drawer after navigation on mobile
+            if(body.classList.contains('drawer-open')) closeDrawer();
+          }
+        });
+      });
+    }
+    wireSmoothLinks(document);
+    wireSmoothLinks(drawer);
+
+    // Filter sections (desktop + mobile)
+    const filterDesktop = document.getElementById('filter');
+    const filterMobile = document.getElementById('filterMobile');
+    const sections = Array.from(document.querySelectorAll('main section'));
+
+    function applyFilter(val){
+      const q = (val||'').trim().toLowerCase();
+      sections.forEach(s => {
+        const txt = s.innerText.toLowerCase();
+        s.style.display = txt.includes(q) ? '' : 'none';
+      });
+    }
+    filterDesktop?.addEventListener('input', e => applyFilter(e.target.value));
+    filterMobile?.addEventListener('input', e => applyFilter(e.target.value));
+
+    // Anchor copy
+    document.querySelectorAll('.hash').forEach(el => {
+      el.addEventListener('click', async () => {
+        const id = el.dataset.anchor;
+        const url = location.origin + location.pathname + '#' + id;
+        try {
+          await navigator.clipboard.writeText(url);
+          el.textContent = '✓';
+          setTimeout(()=> el.textContent = '#', 900);
+        } catch {
+          location.hash = id;
+        }
+      });
+    });
+  </script>
+</body>
+</html>
